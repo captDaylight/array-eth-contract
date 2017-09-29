@@ -1,8 +1,8 @@
 pragma solidity ^0.4.4;
 
 contract Arbitration {
-  string description;
-  address public winner;
+  string public description;
+  string public winningOpinion;
 
   struct Claimant {
     string opinion;
@@ -21,7 +21,9 @@ contract Arbitration {
     // TODO check that the amount of claimants isn't above 2
 
     // EXPLAIN - what is msg??
-    claimants.push(Claimant(opinion, msg.sender, arbiter));
+    if (claimants.length < 3) {
+      claimants.push(Claimant(opinion, msg.sender, arbiter));
+    }
   }
 
   function verifyArbiter() returns (bool isArbiter) {
@@ -36,16 +38,16 @@ contract Arbitration {
   }
 
   function arbiterGetProposals()
-    returns (string description, string proposal_one, string proposal_two)
+    returns (string _description, string _proposalOne, string _proposalTwo)
   {
     // require allows us to check for specific conditions, otherwise it throws an error
     require(claimants.length < 2 && verifyArbiter());
     return (description, claimants[0].opinion, claimants[1].opinion);
   }
 
-  function arbiterSelectWinner() {
+  function arbiterSelectWinner(uint proposalNumber) {
     require(verifyArbiter());
 
-
+    winningOpinion = claimants[proposalNumber].opinion;
   }
 }
