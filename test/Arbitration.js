@@ -1,5 +1,9 @@
 var Arbitration = artifacts.require('./Arbitration.sol');
 
+const expectDescription = 'What to eat for dinner';
+const expectOpinionOne = 'burrito';
+const expectOpinionTwo = 'pizza';
+
 contract('Arbitration', function(accounts) {
   it('should be deployed', () => {
     return Arbitration.deployed().then((instance) => {
@@ -8,13 +12,13 @@ contract('Arbitration', function(accounts) {
   });
 
   it('should set the description', () => {
-    const description = 'What to eat for dinner';
+
     return Arbitration.deployed().then((instance) => {
-      return instance.addDescription(description);
+      return instance.addDescription(expectDescription);
     }).then((res) => {
       return Arbitration.deployed().then((instance) => {
         return instance.description().then((res) => {
-          return assert.equal(description, res);
+          return assert.equal(expectDescription, res);
         });
       })
     })
@@ -22,12 +26,12 @@ contract('Arbitration', function(accounts) {
 
   it('should add claimant one', () => {
     return Arbitration.deployed().then((instance) => {
-      return instance.addClaimant('burrito', web3.eth.accounts[2], {from: web3.eth.accounts[0]});
+      return instance.addClaimant(expectOpinionOne, web3.eth.accounts[2], {from: web3.eth.accounts[0]});
     }).then((res) => {
       return Arbitration.deployed().then((instance) => {
-        const mockResponse = ['burrito', web3.eth.accounts[0], web3.eth.accounts[2]]
+        const expectedResponse = [expectOpinionOne, web3.eth.accounts[0], web3.eth.accounts[2]]
         return instance.claimants(0).then((res) => {
-          return assert.deepEqual(mockResponse, res);
+          return assert.deepEqual(expectedResponse, res);
         });
       });
     })
@@ -35,14 +39,23 @@ contract('Arbitration', function(accounts) {
 
   it('should add claimant two', () => {
     return Arbitration.deployed().then((instance) => {
-      return instance.addClaimant('burrito', web3.eth.accounts[2], {from: web3.eth.accounts[1]});
+      return instance.addClaimant(expectOpinionTwo, web3.eth.accounts[2], {from: web3.eth.accounts[1]});
     }).then((res) => {
       return Arbitration.deployed().then((instance) => {
-        const mockResponse = ['burrito', web3.eth.accounts[1], web3.eth.accounts[2]]
+        const expectedResponse = [expectOpinionTwo, web3.eth.accounts[1], web3.eth.accounts[2]]
         return instance.claimants(1).then((res) => {
-          return assert.deepEqual(mockResponse, res);
+          return assert.deepEqual(expectedResponse, res);
         });
       });
     })
+  });
+
+  it('should be able to get proposals if arbiter', () => {
+    return Arbitration.deployed().then((instance) => {
+      return instance.arbiterGetProposals.call({from: web3.eth.accounts[2]});
+    }).then((res) => {
+      const expectedResponse = [expectDescription, expectOpinionOne, expectOpinionTwo];
+      return assert.deepEqual(expectedResponse, res);
+    });
   });
 });
