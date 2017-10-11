@@ -34,7 +34,7 @@ contract('Arbitration', function(accounts) {
           return assert.deepEqual(expectedResponse, res);
         });
       });
-    })
+    }).catch(() => assert(false));
   });
 
   it('should add claimant two', () => {
@@ -47,7 +47,7 @@ contract('Arbitration', function(accounts) {
           return assert.deepEqual(expectedResponse, res);
         });
       });
-    })
+    }).catch(() => assert(false));
   });
 
   it('should be able to get proposals if arbiter', () => {
@@ -56,6 +56,36 @@ contract('Arbitration', function(accounts) {
     }).then((res) => {
       const expectedResponse = [expectDescription, expectOpinionOne, expectOpinionTwo];
       return assert.deepEqual(expectedResponse, res);
-    });
+    })
+  });
+
+  it('should not allow non-arbiter to select a winner', () => {
+    return Arbitration.deployed().then((instance) => {
+      return instance.arbiterSelectWinner(0, {from: web3.eth.accounts[1]});
+    }).then((res) => {
+      return assert.isOk(false);
+    }).catch((res) => {
+      return assert.isOk(true);
+    })
+  });
+
+  it('should allow arbiter to select a winner', () => {
+    return Arbitration.deployed().then((instance) => {
+      return instance.arbiterSelectWinner(0, {from: web3.eth.accounts[2]});
+    }).then((res) => {
+      return Arbitration.deployed().then((instance) => {
+        return instance.winningOpinion().then((res) => {
+          return assert.deepEqual(expectOpinionOne, res);
+        })
+      })
+    })
+  });
+
+  it('should have winner selected correctly', () => {
+    return Arbitration.deployed().then((instance) => {
+      return instance.winningOpinion()
+    }).then((res) => {
+      return assert.equal(expectOpinionOne, res);
+    })
   });
 });

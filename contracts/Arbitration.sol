@@ -41,7 +41,7 @@ contract Arbitration {
     returns (string _description, string _proposalOne, string _proposalTwo)
   {
     // require allows us to check for specific conditions, otherwise it throws an error
-    require(claimants.length == 2 && verifyArbiter());
+    require(claimants.length == 2);
     return (description, claimants[0].opinion, claimants[1].opinion);
   }
 
