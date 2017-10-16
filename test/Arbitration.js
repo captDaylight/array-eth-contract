@@ -52,7 +52,7 @@ contract('Arbitration', function(accounts) {
 
   it('should be able to get proposals if arbiter', () => {
     return Arbitration.deployed().then((instance) => {
-      return instance.arbiterGetProposals.call({from: web3.eth.accounts[2]});
+      return instance.getProposals.call({from: web3.eth.accounts[2]});
     }).then((res) => {
       const expectedResponse = [expectDescription, expectOpinionOne, expectOpinionTwo];
       return assert.deepEqual(expectedResponse, res);
@@ -61,7 +61,7 @@ contract('Arbitration', function(accounts) {
 
   it('should not allow non-arbiter to select a winner', () => {
     return Arbitration.deployed().then((instance) => {
-      return instance.arbiterSelectWinner(0, {from: web3.eth.accounts[1]});
+      return instance.selectWinner(0, {from: web3.eth.accounts[1]});
     }).then((res) => {
       return assert.isOk(false);
     }).catch((res) => {
