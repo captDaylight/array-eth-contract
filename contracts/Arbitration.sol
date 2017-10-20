@@ -13,7 +13,7 @@ contract Arbitration {
   Claimant[] public claimants;
   /*mapping(uint => Claimant) public claimants;*/
 
-  function addDescription(string _description) {
+  function setDescription(string _description) {
     description = _description;
   }
 
